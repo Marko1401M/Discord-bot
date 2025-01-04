@@ -2,7 +2,9 @@ require('dotenv').config();
 
 const {Client, Partials, IntentsBitField, REST, Routes, ApplicationCommandOptionType, EmbedBuilder, MessageMentions, channelMention,RoleManager, User, GatewayIntentBits,GuildMembers, Options, Colors, SlashCommandSubcommandGroupBuilder, Embed, embedLength} = require('discord.js');
 
-const {getRankedForSummoner, getColor, getMatchHistory} = require('./riot_api.js')
+const {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard} = require('./riot_api.js');
+
+const {addServer, addPlayer, getLeaderboard} = require('./database.js');
 
 const client = new Client({
     intents: [
@@ -27,6 +29,12 @@ client.login(process.env.DISCORD_BOT_TOKEN);
 
 client.on("ready", (c)=>{
     console.log('Bot is now online');
+    const guilds = c.guilds.cache.map(guild=>guild.id)
+    console.log(guilds)
+    for(let i = 0; i < guilds.length; i++){
+        let g = c.guilds.cache.get(guilds[i]);
+        addServer(g.id, g.name);
+    }
 })
 
 client.on('guildMemberAdd', (c) =>{
@@ -47,6 +55,8 @@ client.on('interactionCreate', async (interaction) =>{
             interaction.reply('Account does not exist!');
             return;
         }
+        account.totalPoints = getTotalPoints(account.tier, account.rank, account.leaguePoints);
+        addPlayer(account,interaction.guildId);
         let embedProfile = new EmbedBuilder()
             .setColor('Red')
             .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
@@ -129,6 +139,36 @@ client.on('interactionCreate', async (interaction) =>{
                 },]);
         }
         interaction.reply({embeds:embdeds});
+    }
+    else if(interaction.commandName == 'leaderboard'){
+        const lb = await getLeaderboard(interaction.guildId);
+        sortLeaderboard(lb);
+        console.log(lb)
+        
+        let embeds = [];
+        for(let i = 0; i < lb.length; i++){
+            if(i >= 5) break;
+            acc = await getRankedForSummoner(lb[i].username, lb[i].tagline);
+            embeds[i] = new EmbedBuilder()
+                .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${acc.profileIconId}.jpg`)
+                .setTitle(`${i + 1}. ${lb[i].username}#${lb[i].tagline}`)
+                .setFields([
+                    {
+                        name: 'Tier',
+                        value: acc.tier,
+                    },
+                    {
+                        name:'Rank',
+                        value: acc.rank,
+                    },
+                ])
+            
+        }
+        if(embeds[0] != null) embeds[0].setColor('Gold')
+        if(embeds[1] != null) embeds[1].setColor('Grey')
+        if(embeds[2] != null) embeds[2].setColor(getColor('BRONZE'))
+        
+        interaction.reply({embeds:embeds});
     }
 })
 

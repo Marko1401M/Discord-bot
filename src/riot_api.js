@@ -5,7 +5,7 @@ const options = {
     }
 };
 
-module.exports = {getRankedForSummoner, getColor, getMatchHistory};
+module.exports = {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard};
 
 async function getLoLAccount(username, tagline){
     const link = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${username}/${tagline}`;
@@ -107,4 +107,34 @@ function getColor(tier){
     else color = 'Random'
 
     return color
+}
+
+function getTotalPoints(tier, rank, leaguePoints){
+    let points = leaguePoints;
+    if(tier == 'IRON') points += 0;
+    else if(tier == 'BRONZE') points += 400;
+    else if(tier == 'SILVER') points += 800;
+    else if(tier == 'GOLD') points += 1200;
+    else if(tier == 'PLATINUM') points += 1600;
+    else if(tier == 'EMERALD') points += 2000;
+    else if(tier == 'DIAMOND') points += 2400;
+    else  points += 2800;
+
+    if(rank == 'I') points += 300;
+    if(rank == 'II') points += 200;
+    if(rank == 'III') points += 100;
+
+    return points;
+}
+
+function sortLeaderboard(leaderboard){
+    for(let i = 0; i < leaderboard.length; i++){
+        for(let j = 0; j < leaderboard.length; j++){
+            if(leaderboard[i].totalPoints > leaderboard[j].totalPoints){
+                let temp = leaderboard[i];
+                leaderboard[i] = leaderboard[j];
+                leaderboard[j] = temp;
+            }
+        }
+    }
 }

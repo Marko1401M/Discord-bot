@@ -38,6 +38,10 @@ const commands = [
             },
         ],
     },
+    {
+        name:'leaderboard',
+        description:'Displays a leaderboard for the specific server',
+    },
 ];
 
 const rest = new REST({version: '10'}).setToken(process.env.DISCORD_BOT_TOKEN);
