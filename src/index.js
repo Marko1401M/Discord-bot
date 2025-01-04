@@ -30,7 +30,6 @@ client.login(process.env.DISCORD_BOT_TOKEN);
 client.on("ready", (c)=>{
     console.log('Bot is now online');
     const guilds = c.guilds.cache.map(guild=>guild.id)
-    console.log(guilds)
     for(let i = 0; i < guilds.length; i++){
         let g = c.guilds.cache.get(guilds[i]);
         addServer(g.id, g.name);
@@ -143,7 +142,6 @@ client.on('interactionCreate', async (interaction) =>{
     else if(interaction.commandName == 'leaderboard'){
         const lb = await getLeaderboard(interaction.guildId);
         sortLeaderboard(lb);
-        console.log(lb)
         
         let embeds = [];
         for(let i = 0; i < lb.length; i++){
