@@ -43,7 +43,6 @@ client.on('guildMemberAdd', (c) =>{
 
 client.on('messageCreate', (msg) =>{
     if(msg.author.bot) return;
-
 })
 
 client.on('interactionCreate', async (interaction) =>{
@@ -77,6 +76,7 @@ client.on('interactionCreate', async (interaction) =>{
         interaction.reply({embeds:[embed]});
     }
     else if(interaction.commandName == 'lol_profile'){
+        console.log(interaction.options.get('username').value + ' ' + interaction.options.get('tag').value)
         const account = await getRankedForSummoner(interaction.options.get('username').value, interaction.options.get('tag').value);
         if(account == null){ 
             interaction.reply('Account does not exist!');
@@ -119,6 +119,7 @@ client.on('interactionCreate', async (interaction) =>{
             interaction.reply('Account does not exist!');
             return;
         }
+        
         const matchHistory = await getMatchHistory(account);
         if(matchHistory == null){
             interaction.reply('Error with match history!');
@@ -171,10 +172,14 @@ client.on('interactionCreate', async (interaction) =>{
         const lb = await getLeaderboard(interaction.guildId);
         sortLeaderboard(lb);
         let embeds = [];
+        embeds[0] = new EmbedBuilder()
+            .setTitle('Top 5 players from ' + interaction.guild.name + ' server')
+            .setThumbnail(interaction.guild.iconURL(interaction.guild.icon))
+            .setColor('Red')
         for(let i = 0; i < lb.length; i++){
             if(i >= 5) break;
             acc = await getRankedForSummoner(lb[i].username, lb[i].tagline);
-            embeds[i] = new EmbedBuilder()
+            embeds[i + 1] = new EmbedBuilder()
                 .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${acc.profileIconId}.jpg`)
                 .setTitle(`${i + 1}. ${lb[i].username}#${lb[i].tagline}`)
                 .setFields([
@@ -189,9 +194,9 @@ client.on('interactionCreate', async (interaction) =>{
                 ])
             
         }
-        if(embeds[0] != null) embeds[0].setColor('Gold')
-        if(embeds[1] != null) embeds[1].setColor('Grey')
-        if(embeds[2] != null) embeds[2].setColor(getColor('BRONZE'))
+        if(embeds[1] != null) embeds[1].setColor('Gold')
+        if(embeds[2] != null) embeds[2].setColor('Grey')
+        if(embeds[3] != null) embeds[3].setColor(getColor('BRONZE'))
         
         interaction.reply({embeds:embeds});
     }
@@ -255,4 +260,3 @@ client.on('interactionCreate', async (interaction) =>{
         interaction.reply({embeds:[embedProfile, embedRank]});
     }
 })
-

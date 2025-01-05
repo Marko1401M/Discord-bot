@@ -130,9 +130,9 @@ function getTotalPoints(tier, rank, leaguePoints){
 }
 
 function sortLeaderboard(leaderboard){
-    for(let i = 0; i < leaderboard.length; i++){
-        for(let j = 0; j < leaderboard.length; j++){
-            if(leaderboard[i].totalPoints > leaderboard[j].totalPoints){
+    for(let i = 0; i < leaderboard.length - 1; i++){
+        for(let j = i+1; j < leaderboard.length; j++){
+            if(leaderboard[i].totalPoints < leaderboard[j].totalPoints){
                 let temp = leaderboard[i];
                 leaderboard[i] = leaderboard[j];
                 leaderboard[j] = temp;
