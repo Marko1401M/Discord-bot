@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-module.exports = {addServer, addPlayer, getLeaderboard}
+module.exports = {addServer, addPlayer, getLeaderboard, linkAccounts,getLolByDiscordId}
 const con = mysql.createConnection(
     {
         host: process.env.DB_HOST,
@@ -21,7 +21,6 @@ function addServer(serverId, serverName){
                 console.log(`Dodat je server ${serverName}`);
             })
         }
-        console.log(result);
     });
 }
 
@@ -61,7 +60,6 @@ async function getNameFromId(playerId){
         con.query(sql, (err, result, fields)=>{
             if(err) throw err;
             if(result.length > 0){
-                //console.log(result);
                 resolve(result);
             }
             else{
@@ -89,8 +87,62 @@ async function getLeaderboard(serverId){
                 }
             }
             resolve(player);
-            //resolve(null);
         })
     })
-    
+}
+
+async function linkAccounts(account, discord_id){
+    let sql = `SELECT * from linked_accounts where summonerId= '${account.id}' and discordId = '${discord_id}'`;
+    return new Promise((resolve, reject)=>{
+        con.query(sql, (err, result, fields) =>{
+            if(err) throw err;
+            console.log(result);
+            if(result.length > 0) resolve(false);
+            else{
+                let sql = `INSERT INTO linked_accounts(summonerId, discordId) VALUES('${account.id}','${discord_id}')`;
+                con.query(sql,(err,result,fields)=>{
+                    if(err) throw err;
+                })
+                resolve(true);
+            }
+        })
+    })
+}
+
+async function getLolByDiscordId(discord_id){
+    let sumId = await getLinkedAccount(discord_id);
+    if(sumId == null) return null;
+    let user = await getAccountById(sumId);
+    return user;
+}
+
+async function getAccountById(summonerId){
+    let sql = `SELECT * from user where summonerId = '${summonerId}'`;
+    return new Promise((resolve, reject)=>{
+        con.query(sql, (err, result, fields)=>{
+            if(err) throw err;
+            if(result.length == 0) resolve(null);
+            else {
+                const user ={
+                    summonerId: result[0].summonerId,
+                    gameName: result[0].username,
+                    tagLine: result[0].tagline,
+                }
+                resolve(user);
+            }
+        })
+    })
+}
+
+async function getLinkedAccount(discord_id){
+    let sql = `SELECT * from linked_accounts where discordId = '${discord_id}'`;
+    return new Promise((resolve, reject)=>{
+        con.query(sql, (err, result, fields)=>{
+            if(err) throw err;
+            if(result.length == 0) {
+                resolve(null);
+            }
+            else resolve(result[0].summonerId);
+        })
+    })
 }

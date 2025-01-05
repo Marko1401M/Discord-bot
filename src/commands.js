@@ -4,17 +4,17 @@ const {REST, Routes, Application, ApplicationCommand, ApplicationCommandOptionTy
 const commands = [
     {
         name: 'lol_profile',
-        description: 'Displays your Level, Tier and rank in Ranked Solo/Duo',
+        description: 'Displays your Level, Tier and rank in Ranked Solo/Duo.',
         options:[
             {
                 name:'username',
-                description:'Username from game',
+                description:'Username from game.',
                 type:ApplicationCommandOptionType.String,
                 required: true,
             },
             {
                 name:'tag',
-                description:'Tag from game, eg. #EUNE',
+                description:'Tag from game, eg. #EUNE.',
                 type:ApplicationCommandOptionType.String,
                 required: true,
             },
@@ -22,7 +22,7 @@ const commands = [
     },
     {
         name: 'lol_match_history',
-        description: 'Displays your past 5 matches from League Of Legends',
+        description: 'Displays your past 5 matches from League Of Legends.',
         options:[
             {
                 name:'username',
@@ -40,8 +40,34 @@ const commands = [
     },
     {
         name:'leaderboard',
-        description:'Displays a leaderboard for the specific server',
+        description:'Displays a leaderboard for the specific server.',
     },
+    {
+        name:'help',
+        description:'Displays all commands.',
+    },
+    {
+        name: 'link_lol_profile',
+        description: 'Connects your League Of Legends profile with your Discord account.',
+        options:[
+            {
+                name:'username',
+                description:'Username from game.',
+                type:ApplicationCommandOptionType.String,
+                required: true,
+            },
+            {
+                name:'tag',
+                description:'Tag from game, eg. #EUNE.',
+                type:ApplicationCommandOptionType.String,
+                required: true,
+            },
+        ],
+    },{
+        name: 'my_profile',
+        description: 'Displays your LoL profile, but only if you linked it with command.',
+    },
+    
 ];
 
 const rest = new REST({version: '10'}).setToken(process.env.DISCORD_BOT_TOKEN);

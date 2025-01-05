@@ -2,9 +2,9 @@ require('dotenv').config();
 
 const {Client, Partials, IntentsBitField, REST, Routes, ApplicationCommandOptionType, EmbedBuilder, MessageMentions, channelMention,RoleManager, User, GatewayIntentBits,GuildMembers, Options, Colors, SlashCommandSubcommandGroupBuilder, Embed, embedLength} = require('discord.js');
 
-const {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard} = require('./riot_api.js');
+const {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard,getRankedByDiscordId} = require('./riot_api.js');
 
-const {addServer, addPlayer, getLeaderboard} = require('./database.js');
+const {addServer, addPlayer, getLeaderboard, linkAccounts} = require('./database.js');
 
 const client = new Client({
     intents: [
@@ -38,7 +38,7 @@ client.on("ready", (c)=>{
 
 client.on('guildMemberAdd', (c) =>{
     const channel = c.guild.channels.cache.get(process.env.TEST_CHANNEL_ID);
-    channel.send('Welcome to server ' + c.displayName + '!');
+    channel.send('Welcome to ' + c.guild.name + ' server ' + c.displayName + '!');
 })
 
 client.on('messageCreate', (msg) =>{
@@ -142,7 +142,6 @@ client.on('interactionCreate', async (interaction) =>{
     else if(interaction.commandName == 'leaderboard'){
         const lb = await getLeaderboard(interaction.guildId);
         sortLeaderboard(lb);
-        
         let embeds = [];
         for(let i = 0; i < lb.length; i++){
             if(i >= 5) break;
@@ -167,6 +166,85 @@ client.on('interactionCreate', async (interaction) =>{
         if(embeds[2] != null) embeds[2].setColor(getColor('BRONZE'))
         
         interaction.reply({embeds:embeds});
+    }
+    else if(interaction.commandName == 'link_lol_profile'){
+        const account = await getRankedForSummoner(interaction.options.get('username').value, interaction.options.get('tag').value);
+        
+        let embed;
+        if(account == null){
+            embed = new EmbedBuilder()
+                .setTitle('Error loading your account :(!')
+                .setColor('Red')
+        }
+        let res = await linkAccounts(account, interaction.user.id);
+        if(res){
+            embed = new EmbedBuilder()
+                .setTitle('Succesfully linked ' + account.gameName + ' with Discord account!')
+                .setColor('Green')
+        }
+        else {
+            embed = new EmbedBuilder()
+                .setTitle('Account ' + account.gameName + ' is already linked with Discord account!')
+                .setColor('Yellow')
+        }
+        interaction.reply({embeds:[embed]});
+    }
+    else if(interaction.commandName == 'help'){
+        let embed = new EmbedBuilder()
+            .setColor('Aqua')
+            .setTitle('List of all commands')
+            .setFields([
+                {
+                    name:'/lol_profile',
+                    value:'Shows your League Of Legends profile, level and rank.',
+                },
+                {
+                    name:'/lol_match_history',
+                    value:'Shows your past 5 matches from League Of Legends.',
+                },
+                {
+                    name:'/leaderboard',
+                    value:'Shows top 5 League Of Legends Ranked players from that server.',
+                },
+            ])
+        interaction.reply({embeds:[embed]});
+    }
+    else if(interaction.commandName == 'my_profile'){
+        const account = await getRankedByDiscordId(interaction.user.id);
+        if(account == null){ 
+            interaction.reply('Account does not exist!');
+            return;
+        }
+        account.totalPoints = getTotalPoints(account.tier, account.rank, account.leaguePoints);
+        addPlayer(account,interaction.guildId);
+        let embedProfile = new EmbedBuilder()
+            .setColor('Red')
+            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
+            .setTitle(`${account.gameName}#${account.tagLine}`)
+            .setFields([
+                {
+                    name:'Level',
+                    value: account.summonerLevel + "",
+                },
+            ])
+        let embedRank = new EmbedBuilder()
+            .setColor(getColor(account.tier))
+            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${account.tier.toLowerCase()}.png`)
+            .setFields([
+                {
+                    name:'Tier',
+                    value:account.tier,
+                },
+                {
+                    name:'Rank',
+                    value:account.rank,
+                },
+                {
+                    name:'Winrate',
+                    value: (account.wins / (account.wins + account.losses)) * 100 + "%",
+                },
+            ])
+        interaction.reply({embeds:[embedProfile, embedRank]});
     }
 })
 

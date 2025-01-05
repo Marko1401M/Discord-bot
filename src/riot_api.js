@@ -5,7 +5,9 @@ const options = {
     }
 };
 
-module.exports = {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard};
+module.exports = {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard,getRankedByDiscordId};
+
+const {getLolByDiscordId} = require('./database.js')
 
 async function getLoLAccount(username, tagline){
     const link = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${username}/${tagline}`;
@@ -137,4 +139,12 @@ function sortLeaderboard(leaderboard){
             }
         }
     }
+}
+
+async function getRankedByDiscordId(discord_id){
+    let user = await getLolByDiscordId(discord_id);
+    console.log(user);
+    let rank = await getRankedForSummoner(user.gameName, user.tagLine);
+    console.log(rank);
+    return rank;
 }
