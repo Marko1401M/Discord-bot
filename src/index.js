@@ -127,7 +127,7 @@ client.on('interactionCreate', async (interaction) =>{
         }
         let embdeds = [];
         embdeds[0] = new EmbedBuilder()
-            .setColor('Red')
+            .setColor('Blue')
             .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
             .setTitle(`Match history for ${account.gameName}#${account.tagLine}`)
             .setFields([
