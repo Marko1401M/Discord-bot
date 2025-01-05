@@ -48,6 +48,34 @@ client.on('messageCreate', (msg) =>{
 
 client.on('interactionCreate', async (interaction) =>{
     if(!interaction.isChatInputCommand()) return;
+    else if(interaction.commandName == 'help'){
+        let embed = new EmbedBuilder()
+            .setColor('Aqua')
+            .setTitle('List of all commands')
+            .setFields([
+                {
+                    name:'/lol_profile',
+                    value:'Shows your League Of Legends profile, level and rank.',
+                },
+                {
+                    name:'/lol_match_history',
+                    value:'Shows your past 5 matches from League Of Legends.',
+                },
+                {
+                    name:'/leaderboard',
+                    value:'Shows top 5 League Of Legends Ranked players from that server.',
+                },
+                {
+                    name:'/link_lol_profile',
+                    value:'Links specified account with your Discord account.',
+                },
+                {
+                    name:'/my_profile',
+                    value:'Shows your LoL profile, but only if you already linked it.',
+                },
+            ])
+        interaction.reply({embeds:[embed]});
+    }
     else if(interaction.commandName == 'lol_profile'){
         const account = await getRankedForSummoner(interaction.options.get('username').value, interaction.options.get('tag').value);
         if(account == null){ 
@@ -187,26 +215,6 @@ client.on('interactionCreate', async (interaction) =>{
                 .setTitle('Account ' + account.gameName + ' is already linked with Discord account!')
                 .setColor('Yellow')
         }
-        interaction.reply({embeds:[embed]});
-    }
-    else if(interaction.commandName == 'help'){
-        let embed = new EmbedBuilder()
-            .setColor('Aqua')
-            .setTitle('List of all commands')
-            .setFields([
-                {
-                    name:'/lol_profile',
-                    value:'Shows your League Of Legends profile, level and rank.',
-                },
-                {
-                    name:'/lol_match_history',
-                    value:'Shows your past 5 matches from League Of Legends.',
-                },
-                {
-                    name:'/leaderboard',
-                    value:'Shows top 5 League Of Legends Ranked players from that server.',
-                },
-            ])
         interaction.reply({embeds:[embed]});
     }
     else if(interaction.commandName == 'my_profile'){
