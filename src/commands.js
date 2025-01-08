@@ -63,9 +63,22 @@ const commands = [
                 required: true,
             },
         ],
-    },{
+    },
+    {
         name: 'my_profile',
         description: 'Displays your LoL profile, but only if you linked it with command.',
+    },
+    {
+        name: 'ban_word',
+        description: 'Adds specified word to ban-list.',
+        options:[
+            {
+                name:'word',
+                description:'A word that you want to ban.(Only if Administrator)',
+                type:ApplicationCommandOptionType.String,
+                required: true,
+            }, 
+        ],
     },
     
 ];

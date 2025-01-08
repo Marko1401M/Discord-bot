@@ -4,7 +4,7 @@ const {Client, Partials, IntentsBitField, REST, Routes, ApplicationCommandOption
 
 const {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard,getRankedByDiscordId} = require('./riot_api.js');
 
-const {addServer, addPlayer, getLeaderboard, linkAccounts} = require('./database.js');
+const {addServer, addPlayer, getLeaderboard, linkAccounts, banWord, getBannedWords} = require('./database.js');
 
 const client = new Client({
     intents: [
@@ -259,4 +259,29 @@ client.on('interactionCreate', async (interaction) =>{
             ])
         interaction.reply({embeds:[embedProfile, embedRank]});
     }
+    else if(interaction.commandName == 'ban_word'){
+        if(interaction.member.permissionsIn(interaction.channel).has('ADMINISTRATOR')){
+            if(await banWord(interaction.options.get("word").value, interaction.user.id)){
+                interaction.reply(`'${interaction.options.get("word").value}' has been added to the ban-list!`);
+            }
+            else {
+                interaction.reply(`${interaction.options.get("word").value} is already banned!`);
+            }
+        }
+    }
 })
+
+client.on('messageCreate', async (msg) =>{
+    if(msg.author.bot) return;
+    let bannedWords = await getBannedWords();
+    console.log(bannedWords);
+    for(let i = 0; i < bannedWords.length; i++){
+        let regex = new RegExp(bannedWords[i].content,'i');
+        if(regex.test(msg)){
+            await msg.reply("Zabranjena rec!");
+            msg.delete();
+            break;
+        }
+    }
+})
+

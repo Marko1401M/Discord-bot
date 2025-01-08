@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-module.exports = {addServer, addPlayer, getLeaderboard, linkAccounts,getLolByDiscordId}
+module.exports = {addServer, addPlayer, getLeaderboard, linkAccounts,getLolByDiscordId, banWord, getBannedWords}
 const con = mysql.createConnection(
     {
         host: process.env.DB_HOST,
@@ -143,6 +143,36 @@ async function getLinkedAccount(discord_id){
                 resolve(null);
             }
             else resolve(result[0].summonerId);
+        })
+    })
+}
+
+async function banWord(word, banned_by = null){
+    let sql = `SELECT * from banned_words where content ='${word}'`
+    return new Promise((resolve, reject)=>{
+        con.query(sql,(err, result, fields)=>{
+            if(err) throw err;
+            if(result.length > 0) resolve(false);
+            else{
+                let sql = `INSERT into banned_words(content, banned_by) VALUES ('${word}','${banned_by}')`
+                resolve(new Promise((resolve, reject)=>{
+                    con.query(sql,(err,result, fields)=>{
+                        if(err) throw err;
+                        resolve(true);
+                    })
+                }))
+                
+            }
+        })
+    })
+}
+
+async function getBannedWords(){
+    let sql = `SELECT * from banned_words`;
+    return new Promise((resolve, reject)=>{
+        con.query(sql,(err, result, fields) =>{
+            if(err) throw err;
+            resolve(result);
         })
     })
 }
