@@ -1,8 +1,8 @@
 require('dotenv').config();
 
-const {Client, Partials, IntentsBitField, REST, Routes, ApplicationCommandOptionType, EmbedBuilder, MessageMentions, channelMention,RoleManager, User, GatewayIntentBits,GuildMembers, Options, Colors, SlashCommandSubcommandGroupBuilder, Embed, embedLength} = require('discord.js');
+const {Client, Partials, IntentsBitField, REST, Routes, ApplicationCommandOptionType, EmbedBuilder, MessageMentions, channelMention,RoleManager, User, GatewayIntentBits,GuildMembers, Options, Colors, SlashCommandSubcommandGroupBuilder, Embed, embedLength, getUserAgentAppendix} = require('discord.js');
 
-const {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard,getRankedByDiscordId} = require('./riot_api.js');
+const {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard,getRankedByDiscordId, getSummoner} = require('./riot_api.js');
 
 const {addServer, addPlayer, getLeaderboard, linkAccounts, banWord, getBannedWords} = require('./database.js');
 
@@ -77,9 +77,43 @@ client.on('interactionCreate', async (interaction) =>{
     }
     else if(interaction.commandName == 'lol_profile'){
         console.log(interaction.options.get('username').value + ' ' + interaction.options.get('tag').value)
-        const account = await getRankedForSummoner(interaction.options.get('username').value, interaction.options.get('tag').value);
+        let account = await getRankedForSummoner(interaction.options.get('username').value, interaction.options.get('tag').value);
         if(account == null){ 
             interaction.reply('Account does not exist!');
+            return;
+        }
+        if(account.tier == null){
+            console.log('acc: ')
+            console.log(account);
+            account = await getSummoner(interaction.options.get('username').value, interaction.options.get('tag').value)
+            let embedProfile = new EmbedBuilder()
+            .setColor('Red')
+            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
+            .setTitle(`${account.gameName}#${account.tagLine}`)
+            .setFields([
+                {
+                    name:'Level',
+                    value: account.summonerLevel + "",
+                },
+            ])
+            let embedRank = new EmbedBuilder()
+            .setColor('LightGrey')
+            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${'UNRANKED'}.png`)
+            .setFields([
+                {
+                    name:'Tier',
+                    value:'UNRANKED',
+                },
+                {
+                    name:'Rank',
+                    value:'UNRANKED',
+                },
+                {
+                    name:'Winrate',
+                    value: '/',
+                },
+            ])
+            interaction.reply({embeds:[embedProfile, embedRank]});
             return;
         }
         account.totalPoints = getTotalPoints(account.tier, account.rank, account.leaguePoints);
@@ -228,6 +262,39 @@ client.on('interactionCreate', async (interaction) =>{
             interaction.reply('Account does not exist!');
             return;
         }
+        if(account.tier == null){
+            console.log('acc: ')
+            console.log(account);
+            let embedProfile = new EmbedBuilder()
+            .setColor('Red')
+            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
+            .setTitle(`${account.gameName}#${account.tagLine}`)
+            .setFields([
+                {
+                    name:'Level',
+                    value: account.summonerLevel + "",
+                },
+            ])
+            let embedRank = new EmbedBuilder()
+            .setColor('LightGrey')
+            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${'UNRANKED'}.png`)
+            .setFields([
+                {
+                    name:'Tier',
+                    value:'UNRANKED',
+                },
+                {
+                    name:'Rank',
+                    value:'UNRANKED',
+                },
+                {
+                    name:'Winrate',
+                    value: '/',
+                },
+            ])
+            interaction.reply({embeds:[embedProfile, embedRank]});
+            return;
+        }
         account.totalPoints = getTotalPoints(account.tier, account.rank, account.leaguePoints);
         addPlayer(account,interaction.guildId);
         let embedProfile = new EmbedBuilder()
@@ -273,12 +340,12 @@ client.on('interactionCreate', async (interaction) =>{
 
 client.on('messageCreate', async (msg) =>{
     if(msg.author.bot) return;
+    if(msg.channel.id != process.env.TEST_CHANNEL_ID) return;
     let bannedWords = await getBannedWords();
-    console.log(bannedWords);
     for(let i = 0; i < bannedWords.length; i++){
         let regex = new RegExp(bannedWords[i].content,'i');
         if(regex.test(msg)){
-            await msg.reply("Zabranjena rec!");
+            await msg.reply("That word is banned!");
             msg.delete();
             break;
         }
