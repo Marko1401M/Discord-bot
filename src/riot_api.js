@@ -55,6 +55,22 @@ async function getRankedForSummoner(username, tagline){
             }
         }
     }
+    if(responseJson.length == 0){
+        rankedSummoner = {
+            gameName: user.gameName,
+            tagLine: user.tagLine,
+            puuid: user.puuid,
+            id: user.id,
+            accountId: user.accountId,
+            profileIconId: user.profileIconId,
+            summonerLevel: user.summonerLevel,
+            tier: 'UNRANKED',
+            rank: 'UNRANKED',
+            leaguePoints: '0',
+            wins: '0',
+            losses: '0',
+        }
+    }
     return rankedSummoner;
 }
 

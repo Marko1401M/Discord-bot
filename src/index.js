@@ -82,40 +82,6 @@ client.on('interactionCreate', async (interaction) =>{
             interaction.reply('Account does not exist!');
             return;
         }
-        if(account.tier == null){
-            console.log('acc: ')
-            console.log(account);
-            account = await getSummoner(interaction.options.get('username').value, interaction.options.get('tag').value)
-            let embedProfile = new EmbedBuilder()
-            .setColor('Red')
-            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
-            .setTitle(`${account.gameName}#${account.tagLine}`)
-            .setFields([
-                {
-                    name:'Level',
-                    value: account.summonerLevel + "",
-                },
-            ])
-            let embedRank = new EmbedBuilder()
-            .setColor('LightGrey')
-            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${'UNRANKED'}.png`)
-            .setFields([
-                {
-                    name:'Tier',
-                    value:'UNRANKED',
-                },
-                {
-                    name:'Rank',
-                    value:'UNRANKED',
-                },
-                {
-                    name:'Winrate',
-                    value: '/',
-                },
-            ])
-            interaction.reply({embeds:[embedProfile, embedRank]});
-            return;
-        }
         account.totalPoints = getTotalPoints(account.tier, account.rank, account.leaguePoints);
         addPlayer(account,interaction.guildId);
         let embedProfile = new EmbedBuilder()
@@ -262,39 +228,39 @@ client.on('interactionCreate', async (interaction) =>{
             interaction.reply('Account does not exist!');
             return;
         }
-        if(account.tier == null){
-            console.log('acc: ')
-            console.log(account);
-            let embedProfile = new EmbedBuilder()
-            .setColor('Red')
-            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
-            .setTitle(`${account.gameName}#${account.tagLine}`)
-            .setFields([
-                {
-                    name:'Level',
-                    value: account.summonerLevel + "",
-                },
-            ])
-            let embedRank = new EmbedBuilder()
-            .setColor('LightGrey')
-            .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${'UNRANKED'}.png`)
-            .setFields([
-                {
-                    name:'Tier',
-                    value:'UNRANKED',
-                },
-                {
-                    name:'Rank',
-                    value:'UNRANKED',
-                },
-                {
-                    name:'Winrate',
-                    value: '/',
-                },
-            ])
-            interaction.reply({embeds:[embedProfile, embedRank]});
-            return;
-        }
+        // if(account.tier == null){
+        //     console.log('acc: ')
+        //     console.log(account);
+        //     let embedProfile = new EmbedBuilder()
+        //     .setColor('Red')
+        //     .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
+        //     .setTitle(`${account.gameName}#${account.tagLine}`)
+        //     .setFields([
+        //         {
+        //             name:'Level',
+        //             value: account.summonerLevel + "",
+        //         },
+        //     ])
+        //     let embedRank = new EmbedBuilder()
+        //     .setColor('LightGrey')
+        //     .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/${'UNRANKED'}.png`)
+        //     .setFields([
+        //         {
+        //             name:'Tier',
+        //             value:'UNRANKED',
+        //         },
+        //         {
+        //             name:'Rank',
+        //             value:'UNRANKED',
+        //         },
+        //         {
+        //             name:'Winrate',
+        //             value: '/',
+        //         },
+        //     ])
+        //     interaction.reply({embeds:[embedProfile, embedRank]});
+        //     return;
+        // }
         account.totalPoints = getTotalPoints(account.tier, account.rank, account.leaguePoints);
         addPlayer(account,interaction.guildId);
         let embedProfile = new EmbedBuilder()
