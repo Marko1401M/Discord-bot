@@ -159,13 +159,9 @@ function sortLeaderboard(leaderboard){
 
 async function getRankedByDiscordId(discord_id){
     let user = await getLolByDiscordId(discord_id);
-    console.log(user);
     let rank = await getRankedForSummoner(user.gameName, user.tagLine);
-    console.log('rank:');
-    console.log(rank);
     if(rank == null || rank == -1){
         return await getSummoner(user.gameName, user.tagLine);
     }
-    console.log(rank);
     return rank;
 }
