@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-module.exports = {addServer, addPlayer, getLeaderboard, linkAccounts,getLolByDiscordId, banWord, getBannedWords}
+module.exports = {addServer, addPlayer, getLeaderboard, linkAccounts,getLolByDiscordId, banWord, getBannedWords, changeLolDetails}
 const con = mysql.createConnection(
     {
         host: process.env.DB_HOST,
@@ -175,4 +175,15 @@ async function getBannedWords(){
             resolve(result);
         })
     })
+}
+
+async function changeLolDetails(username, tag, discordId){
+    let t = await getLinkedAccount(discordId);
+    if(t == 0 || t == null) return false;
+    console.log(t);
+    let sql = `UPDATE user set username="${username}", tagline = "${tag}" where summonerId = "${t}"`;
+    con.query(sql,(err, result, fields) => {
+        if(err) throw err;
+    })
+    return true;
 }

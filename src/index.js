@@ -4,7 +4,7 @@ const {Client, Partials, IntentsBitField, REST, Routes, ApplicationCommandOption
 
 const {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard,getRankedByDiscordId, getSummoner} = require('./riot_api.js');
 
-const {addServer, addPlayer, getLeaderboard, linkAccounts, banWord, getBannedWords} = require('./database.js');
+const {addServer, addPlayer, getLeaderboard, linkAccounts, banWord, getBannedWords, changeLolDetails} = require('./database.js');
 
 const client = new Client({
     intents: [
@@ -278,6 +278,13 @@ client.on('interactionCreate', async (interaction) =>{
             if(element.manageable) element.setNickname(newNick);
         });
 
+        
+    }
+    else if(interaction.commandName == 'change_lol_details'){
+        let username = interaction.options.get('username').value;
+        let tag = interaction.options.get('tag').value;
+        if(changeLolDetails(username, tag,interaction.user.id)) interaction.reply('Succes!');
+        else interaction.reply('Fail!');
         
     }
 })

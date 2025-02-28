@@ -92,6 +92,24 @@ const commands = [
             },
         ],
     },
+    {
+        name:'change_lol_details',
+        description:'Changes your details fo Your linked account',
+        options:[
+            {
+                name:'username',
+                description:'Username from game.',
+                type:ApplicationCommandOptionType.String,
+                required: true,
+            },
+            {
+                name:'tag',
+                description:'Tag from game, eg. #EUNE.',
+                type:ApplicationCommandOptionType.String,
+                required: true,
+            },
+        ],
+    },
     
 ];
 
