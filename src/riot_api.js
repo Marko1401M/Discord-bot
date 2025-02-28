@@ -5,7 +5,7 @@ const options = {
     }
 };
 
-module.exports = {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints,sortLeaderboard,getRankedByDiscordId,getSummoner};
+module.exports = {getRankedForSummoner, getColor, getMatchHistory, getTotalPoints, sortLeaderboard, getRankedByDiscordId, getSummoner};
 
 const {getLolByDiscordId} = require('./database.js')
 
@@ -37,6 +37,7 @@ async function getRankedForSummoner(username, tagline){
     if(response.status != 200) return null;
     const responseJson = await response.json();
     let rankedSummoner = -1;
+    let ind = true;;
     for(let i = 0; i < responseJson.length; i++){
         if(responseJson[i].queueType == 'RANKED_SOLO_5x5'){
             rankedSummoner = {
@@ -53,9 +54,10 @@ async function getRankedForSummoner(username, tagline){
                 wins: responseJson[i].wins,
                 losses: responseJson[i].losses,
             }
+            ind = false;
         }
     }
-    if(responseJson.length == 0){
+    if(ind){
         rankedSummoner = {
             gameName: user.gameName,
             tagLine: user.tagLine,
@@ -129,6 +131,7 @@ function getColor(tier){
 
 function getTotalPoints(tier, rank, leaguePoints){
     let points = leaguePoints;
+    if(tier == 'UNRANKED') return 0;
     if(tier == 'IRON') points += 0;
     else if(tier == 'BRONZE') points += 400;
     else if(tier == 'SILVER') points += 800;

@@ -125,6 +125,7 @@ client.on('interactionCreate', async (interaction) =>{
             return;
         }
         let embdeds = [];
+        console.log(account.profileIconId);
         embdeds[0] = new EmbedBuilder()
             .setColor('Blue')
             .setThumbnail(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${account.profileIconId}.jpg`)
@@ -267,6 +268,17 @@ client.on('interactionCreate', async (interaction) =>{
                 interaction.reply(`${interaction.options.get("word").value} is already banned!`);
             }
         }
+    }
+    else if(interaction.commandName == 'change_nickname'){
+        let newNick = interaction.options.get("change_to").value;
+        if(newNick = 'def1') newNick = '';
+        if(newNick == '') interaction.reply('Removing nicknames...')
+        else interaction.reply('Changing nicknames to ' + newNick);
+        (await interaction.guild.members.fetch()).forEach(element => {
+            if(element.manageable) element.setNickname(newNick);
+        });
+
+        
     }
 })
 

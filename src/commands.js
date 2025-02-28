@@ -80,6 +80,18 @@ const commands = [
             }, 
         ],
     },
+    {
+        name:'change_nickname',
+        description:'Changes nickname to ever user on server',
+        options:[
+            {
+                name:'change_to',
+                description:'New nickname, set to `def1` for default',
+                type:ApplicationCommandOptionType.String,
+                required: true,
+            },
+        ],
+    },
     
 ];
 
