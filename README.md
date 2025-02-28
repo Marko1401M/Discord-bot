@@ -6,7 +6,7 @@
  mysql
  nodemon
 
-# Functionality 
+# Features 
  Connects to mysql database.
  Returns your League Of Legends Profile with Rank, Level, Summoner Icon etc..
  You can get your 5 most recent matches.
